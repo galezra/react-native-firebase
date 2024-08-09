@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /*
  * Copyright (c) 2016-present Invertase Limited & Contributors
  *
@@ -25,7 +26,13 @@ const platformSupportedModules = [];
 if (Platform.other) {
   platformSupportedModules.push('app');
   platformSupportedModules.push('functions');
+  platformSupportedModules.push('firestore');
+  platformSupportedModules.push('database');
+  platformSupportedModules.push('auth');
   platformSupportedModules.push('storage');
+  platformSupportedModules.push('remoteConfig');
+  platformSupportedModules.push('analytics');
+  platformSupportedModules.push('appCheck');
   // TODO add more modules here once they are supported.
 }
 
@@ -56,6 +63,7 @@ ErrorUtils.setGlobalHandler((err, isFatal) => {
   throw err;
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function loadTests(_) {
   describe('React Native Firebase', function () {
     if (!global.RNFBDebug) {
@@ -73,12 +81,17 @@ function loadTests(_) {
         firebase.auth().useEmulator('http://localhost:9099');
       if (platformSupportedModules.includes('firestore')) {
         firebase.firestore().useEmulator('localhost', 8080);
+        firebase.app().firestore('second-rnfb').useEmulator('localhost', 8080);
         // Firestore caches documents locally (a great feature!) and that confounds tests
         // as data from previous runs pollutes following runs until re-install the app. Clear it.
-        firebase.firestore().clearPersistence();
+        if (!Platform.other) {
+          firebase.firestore().clearPersistence();
+        }
       }
-      if (platformSupportedModules.includes('storage'))
+      if (platformSupportedModules.includes('storage')) {
         firebase.storage().useEmulator('localhost', 9199);
+        firebase.app().storage('gs://react-native-firebase-testing').useEmulator('localhost', 9199);
+      }
     });
 
     afterEach(async function afterEachTest() {

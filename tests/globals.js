@@ -183,8 +183,30 @@ global.FirebaseHelpers = {
         projectId: 'react-native-firebase-testing',
         storageBucket: 'react-native-firebase-testing.appspot.com',
         messagingSenderId: '448618578101',
+        // TODO RNFB is using the old gaTrackingId property, we should remove this in the future
+        // in favor of the measurementId property.
+        gaTrackingId: 'G-HX0JQKHZEB',
       };
     },
+  },
+  async fetchAppCheckToken() {
+    const tokenRequest = await fetch(
+      'https://us-central1-react-native-firebase-testing.cloudfunctions.net/fetchAppCheckToken',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          data: {
+            appId: global.FirebaseHelpers.app.config().appId,
+          },
+        }),
+        redirect: 'follow',
+      },
+    );
+    const { result } = await tokenRequest.json();
+    return result;
   },
 };
 
